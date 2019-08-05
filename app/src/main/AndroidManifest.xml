@@ -3,6 +3,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	package="com.mohsenmb.facedetectiontest">
 
+	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.CAMERA" />
 
 	<application
@@ -19,7 +20,9 @@
 			android:name="com.google.firebase.ml.vision.DEPENDENCIES"
 			android:value="face" />
 
-		<activity android:name=".CameraActivity">
+		<activity
+			android:name=".CameraActivity"
+			android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 

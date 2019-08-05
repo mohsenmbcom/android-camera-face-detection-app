@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FaceDetectionTest</string>
+	<string name="error_permission_not_granted">Camera permission not granted. To continue please go to the settings and grant the camera permission</string>
 </resources>

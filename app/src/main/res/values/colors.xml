@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
+	<color name="colorPrimary">#686999</color>
+	<color name="colorPrimaryDark">@android:color/transparent</color>
+	<color name="colorAccent">#787999</color>
+	<color name="background_camera_bottom_bar">#55000000</color>
+	<color name="stroke_camera_snap">#88ffffff</color>
+	<color name="background_camera_snap">#FFF</color>
+	<color name="ripple_camera_snap">#adf</color>
 </resources>
