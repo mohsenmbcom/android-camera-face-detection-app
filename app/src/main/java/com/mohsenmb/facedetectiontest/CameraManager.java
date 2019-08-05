@@ -3,6 +3,7 @@ package com.mohsenmb.facedetectiontest;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
+import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.ViewGroup;
@@ -22,13 +23,13 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 
 	private ActivityResolver activityResolver;
 	private TextureView cameraView;
+	private Size previewResolution = new Size(720, 1080);
 
 	CameraManager(@NonNull ActivityResolver activityResolver, @NonNull TextureView cameraView) {
 		this.activityResolver = activityResolver;
 		activityResolver.setPermissionResultListener(this);
 
 		this.cameraView = cameraView;
-		this.cameraView.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> updateTransform());
 	}
 
 	private void updateTransform() {
@@ -57,6 +58,15 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 				return;
 		}
 
+		float viewRatio = cameraView.getWidth() * 1F / cameraView.getHeight();
+		float prevRatio = previewResolution.getWidth() * 1F / previewResolution.getHeight();
+
+		// If the preview ratio is not the same as the view aspect ratio
+		// this scale modification will fix that
+		float scaleX;
+		scaleX = 1F + Math.abs(viewRatio - prevRatio);
+		matrix.postScale(scaleX, 1F, centerX, centerY);
+
 		matrix.postRotate(-rotation, centerX, centerY);
 
 		// Finally, apply transformations to our TextureView
@@ -79,9 +89,9 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 	private void startCamera() {
 		// Create configuration object for the viewfinder use case
 		PreviewConfig.Builder previewConfigBuilder = new PreviewConfig.Builder();
-        /*previewConfigBuilder.setTargetAspectRatio(new Rational(1, 1));
-        previewConfigBuilder.setTargetResolution(new Size(600, 600));*/
-		previewConfigBuilder.setLensFacing(CameraX.LensFacing.FRONT);
+		previewConfigBuilder
+				.setLensFacing(CameraX.LensFacing.FRONT)
+				.setTargetResolution(previewResolution);
 
 		PreviewConfig previewConfig = previewConfigBuilder.build();
 
@@ -94,6 +104,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 			ViewGroup parent = (ViewGroup) cameraView.getParent();
 			parent.removeView(cameraView);
 			parent.addView(cameraView, 0);
+
 
 			cameraView.setSurfaceTexture(output.getSurfaceTexture());
 			updateTransform();
