@@ -3,6 +3,8 @@ package com.mohsenmb.facedetectiontest;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Matrix;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -11,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.CameraX;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageAnalysisConfig;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
@@ -24,6 +28,9 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 	private ActivityResolver activityResolver;
 	private TextureView cameraView;
 	private Size previewResolution = new Size(720, 1080);
+
+	private FaceDetectionImageAnalyzer.FaceDetectionListener faceDetectionListener;
+
 
 	CameraManager(@NonNull ActivityResolver activityResolver, @NonNull TextureView cameraView) {
 		this.activityResolver = activityResolver;
@@ -87,17 +94,15 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 	}
 
 	private void startCamera() {
-		// Create configuration object for the viewfinder use case
+		// region Create configuration for preview
 		PreviewConfig.Builder previewConfigBuilder = new PreviewConfig.Builder();
 		previewConfigBuilder
 				.setLensFacing(CameraX.LensFacing.FRONT)
 				.setTargetResolution(previewResolution);
 
 		PreviewConfig previewConfig = previewConfigBuilder.build();
-
 		// Build the viewfinder use case
 		Preview preview = new Preview(previewConfig);
-
 		// Every time the viewfinder is updated, recompute layout
 		preview.setOnPreviewOutputUpdateListener(output -> {
 			// To update the SurfaceTexture, we have to remove it and re-add it
@@ -109,9 +114,53 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 			cameraView.setSurfaceTexture(output.getSurfaceTexture());
 			updateTransform();
 		});
+		// endregion
+
+		// region Setup face detection analyzer
+		ImageAnalysisConfig.Builder analyzerConfig = new ImageAnalysisConfig.Builder();
+		// Use a worker thread for image analysis to prevent glitches
+		HandlerThread analyzerThread = new HandlerThread(
+				"FaceDetectionAnalyzer");
+		analyzerThread.start();
+		analyzerConfig.setCallbackHandler(new Handler(analyzerThread.getLooper()));
+		// In our analysis, we care more about the latest image than
+		// analyzing *every* image
+		analyzerConfig.setImageReaderMode(
+				ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE);
+		analyzerConfig.setTargetResolution(previewResolution);
+		analyzerConfig.setLensFacing(CameraX.LensFacing.FRONT);
+
+		FaceDetectionImageAnalyzer analyzer = new FaceDetectionImageAnalyzer();
+		analyzer.setFaceDetectionListener(new FaceDetectionImageAnalyzer.FaceDetectionListener() {
+			int lastDetectedFaces = 0;
+
+			@Override
+			public void onFaceDetected(int faces) {
+				if (faceDetectionListener != null) {
+					if (lastDetectedFaces != faces) {
+						lastDetectedFaces = faces;
+						faceDetectionListener.onFaceDetected(faces);
+					}
+				}
+			}
+
+			@Override
+			public void onNoFaceDetected() {
+				if (faceDetectionListener != null) {
+					if (lastDetectedFaces > 0) {
+						lastDetectedFaces = 0;
+						faceDetectionListener.onNoFaceDetected();
+					}
+				}
+			}
+		});
+		ImageAnalysis analyzerUseCase = new ImageAnalysis(analyzerConfig.build());
+		analyzerUseCase.setAnalyzer(analyzer);
+
+		// endregion
 
 		// Bind use cases to lifecycle
-		CameraX.bindToLifecycle(activityResolver.resolveLifecycleOwner(), preview);
+		CameraX.bindToLifecycle(activityResolver.resolveLifecycleOwner(), preview, analyzerUseCase);
 	}
 
 	@Override
@@ -132,4 +181,11 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 		setup();
 	}
 
+	public void removeFaceDetectionListener() {
+		this.faceDetectionListener = null;
+	}
+
+	public void setFaceDetectionListener(FaceDetectionImageAnalyzer.FaceDetectionListener faceDetectionListener) {
+		this.faceDetectionListener = faceDetectionListener;
+	}
 }

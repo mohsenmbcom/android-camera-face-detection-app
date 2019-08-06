@@ -17,10 +17,13 @@
 		android:fitsSystemWindows="true">
 
 		<androidx.constraintlayout.widget.ConstraintLayout
+			android:id="@+id/view_snap_panel"
 			android:layout_width="match_parent"
 			android:layout_height="72dp"
 			android:layout_gravity="bottom"
-			android:background="@color/background_camera_bottom_bar">
+			android:alpha="0"
+			android:background="@color/background_camera_bottom_bar"
+			tools:alpha="1">
 
 			<View
 				android:layout_width="0dp"
