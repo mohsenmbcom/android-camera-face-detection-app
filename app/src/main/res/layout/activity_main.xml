@@ -4,7 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".CameraActivity">
+	tools:context=".detection.CameraActivity">
 
 	<TextureView
 		android:id="@+id/texture_view"
@@ -26,6 +26,7 @@
 			tools:alpha="1">
 
 			<View
+				android:id="@+id/view_snap_image"
 				android:layout_width="0dp"
 				android:layout_height="0dp"
 				android:layout_margin="8dp"

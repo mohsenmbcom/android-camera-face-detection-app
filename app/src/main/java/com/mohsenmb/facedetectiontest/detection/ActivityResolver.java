@@ -1,4 +1,4 @@
-package com.mohsenmb.facedetectiontest;
+package com.mohsenmb.facedetectiontest.detection;
 
 import android.app.Activity;
 
