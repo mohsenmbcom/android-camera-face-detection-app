@@ -27,12 +27,16 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 		cameraManager = new CameraManager(this, findViewById(R.id.texture_view));
 		cameraManager.setFaceDetectionListener(this);
 
-		findViewById(R.id.view_snap_image).setEnabled(false);
-		findViewById(R.id.view_snap_image).setOnClickListener(view -> cameraManager.captureImage(image -> {
-			Intent myIntent = new Intent(CameraActivity.this, PreviewActivity.class);
-			myIntent.setData(Uri.fromFile(image));
-			startActivity(myIntent);
-		}));
+		findViewById(R.id.view_snap_image).setOnClickListener(view -> {
+			view.setEnabled(false);
+			cameraManager.captureImage(image -> {
+				runOnUiThread(() -> {
+					Intent myIntent = new Intent(CameraActivity.this, PreviewActivity.class);
+					myIntent.setData(Uri.fromFile(image));
+					startActivity(myIntent);
+				});
+			});
+		});
 		cameraManager.setup();
 	}
 
@@ -40,6 +44,18 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+	}
+
+	@Override
+	protected void onPause() {
+		cameraManager.pause();
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		cameraManager.resume();
 	}
 
 	@Override

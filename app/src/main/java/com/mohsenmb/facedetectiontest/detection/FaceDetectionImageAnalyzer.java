@@ -19,7 +19,7 @@ public class FaceDetectionImageAnalyzer implements ImageAnalysis.Analyzer {
 
 	FaceDetectionImageAnalyzer() {
 		FirebaseVisionFaceDetectorOptions visionRealtimeOptions = new FirebaseVisionFaceDetectorOptions.Builder()
-				.setPerformanceMode(FirebaseVisionFaceDetectorOptions.FAST)
+				.setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
 				.setLandmarkMode(FirebaseVisionFaceDetectorOptions.NO_LANDMARKS)
 				.setClassificationMode(FirebaseVisionFaceDetectorOptions.NO_CLASSIFICATIONS)
 				.build();

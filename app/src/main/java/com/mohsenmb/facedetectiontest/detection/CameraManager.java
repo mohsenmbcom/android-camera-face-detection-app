@@ -39,9 +39,16 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 	private ActivityResolver activityResolver;
 	private TextureView cameraView;
 
+	private boolean isSetupCompleted = false;
+
 	private FaceDetectionImageAnalyzer.FaceDetectionListener faceDetectionListener;
+	// This variable saves the last amount of the faces
+	// has seen by the analyzer and avoids calling the callback every time
+	private int lastDetectedFaces = 0;
 
 	private ImageCapture imageCapture;
+	private Preview preview;
+	private ImageAnalysis analyzerUseCase;
 
 
 	CameraManager(@NonNull ActivityResolver activityResolver, @NonNull TextureView cameraView) {
@@ -109,8 +116,28 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 		}
 	}
 
+	void pause() {
+		CameraX.unbindAll();
+	}
+
+	void resume() {
+		if (isSetupCompleted) {
+			if (faceDetectionListener != null) {
+				faceDetectionListener.onNoFaceDetected();
+			}
+			startCamera();
+		}
+	}
+
 	void captureImage(@NonNull final ImageCaptureCallback imageCaptureCallback) {
 		if (imageCapture != null) {
+
+			if (lastDetectedFaces == -1) {
+				return;
+			}
+
+			CameraX.unbind(analyzerUseCase);
+			lastDetectedFaces = -1;
 
 			File file = new File(activityResolver.resolveActivity().getCacheDir(), SAVING_IMAGE_NAME);
 			imageCapture.takePicture(file, new ImageCapture.OnImageSavedListener() {
@@ -147,6 +174,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 		// Bind use cases to lifecycle
 		if (!activityResolver.resolveActivity().isFinishing() && !activityResolver.resolveActivity().isDestroyed()) {
 			CameraX.bindToLifecycle(activityResolver.resolveLifecycleOwner(), createPreviewUseCase(), createImageCaptureUseCase(), createAnalyzerUseCase());
+			isSetupCompleted = true;
 		}
 	}
 
@@ -179,7 +207,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 		PreviewConfig previewConfig = previewConfigBuilder.build();
 
 		// Build the viewfinder use case
-		Preview preview = new Preview(previewConfig);
+		preview = new Preview(previewConfig);
 		// Every time the viewfinder is updated, recompute layout
 		preview.setOnPreviewOutputUpdateListener(output -> {
 			// To update the SurfaceTexture, we have to remove it and re-add it
@@ -196,7 +224,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 
 	private ImageCapture createImageCaptureUseCase() {
 		ImageCaptureConfig.Builder imageCaptureConfig = new ImageCaptureConfig.Builder();
-		imageCaptureConfig.setCaptureMode(ImageCapture.CaptureMode.MAX_QUALITY);
+		imageCaptureConfig.setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY);
 		imageCaptureConfig.setLensFacing(CameraX.LensFacing.FRONT);
 
 		// Build the image capture use case and attach button click listener
@@ -224,10 +252,6 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 
 		FaceDetectionImageAnalyzer analyzer = new FaceDetectionImageAnalyzer();
 		analyzer.setFaceDetectionListener(new FaceDetectionImageAnalyzer.FaceDetectionListener() {
-			// This variable saves the last amount of the faces
-			// has seen by the analyzer and avoids calling the callback every time
-			int lastDetectedFaces = 0;
-
 			@Override
 			public void onFaceDetected(int faces) {
 				if (faceDetectionListener != null) {
@@ -248,7 +272,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 				}
 			}
 		});
-		ImageAnalysis analyzerUseCase = new ImageAnalysis(analyzerConfig.build());
+		analyzerUseCase = new ImageAnalysis(analyzerConfig.build());
 		analyzerUseCase.setAnalyzer(analyzer);
 		return analyzerUseCase;
 	}
