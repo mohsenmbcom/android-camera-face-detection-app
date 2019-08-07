@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -13,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.mohsenmb.facedetectiontest.R;
+import com.mohsenmb.facedetectiontest.preview.PreviewActivity;
 
 public class CameraActivity extends AppCompatActivity implements ActivityResolver, LifecycleOwner, FaceDetectionImageAnalyzer.FaceDetectionListener {
 
@@ -29,11 +29,9 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 
 		findViewById(R.id.view_snap_image).setEnabled(false);
 		findViewById(R.id.view_snap_image).setOnClickListener(view -> cameraManager.captureImage(image -> {
-			StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-			StrictMode.setVmPolicy(builder.build());
-			Intent myIntent = new Intent(Intent.ACTION_VIEW);
-			myIntent.setDataAndType(Uri.fromFile(image), "image/jpg");
-			startActivity(Intent.createChooser(myIntent, "Open image"));
+			Intent myIntent = new Intent(CameraActivity.this, PreviewActivity.class);
+			myIntent.setData(Uri.fromFile(image));
+			startActivity(myIntent);
 		}));
 		cameraManager.setup();
 	}

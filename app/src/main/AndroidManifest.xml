@@ -29,6 +29,14 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+
+
+		<activity
+			android:name=".preview.PreviewActivity"
+			android:label="@string/face_preview"
+			android:parentActivityName=".detection.CameraActivity"
+			android:screenOrientation="portrait"
+			android:theme="@style/PreviewActivityName" />
 	</application>
 
 </manifest>

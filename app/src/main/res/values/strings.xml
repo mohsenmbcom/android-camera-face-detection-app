@@ -4,4 +4,5 @@
 	<string name="cant_find_anything_to_display">Can\'t find anything to display</string>
 	<string name="grant_permission">Grant Permission</string>
 	<string name="title_permission_required">Permission Required</string>
+	<string name="face_preview">Face Preview</string>
 </resources>
