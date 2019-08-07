@@ -27,6 +27,7 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 		cameraManager = new CameraManager(this, findViewById(R.id.texture_view));
 		cameraManager.setFaceDetectionListener(this);
 
+		findViewById(R.id.view_snap_image).setEnabled(false);
 		findViewById(R.id.view_snap_image).setOnClickListener(view -> cameraManager.captureImage(image -> {
 			StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
 			StrictMode.setVmPolicy(builder.build());
