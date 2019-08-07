@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">FaceDetectionTest</string>
-	<string name="error_permission_not_granted">Camera permission not granted. To continue please go to the settings and grant the camera permission</string>
+	<string name="app_name">Face Detection Test</string>
+	<string name="error_permission_not_granted">To detect faces, the app needs permission to access your phone camera.</string>
+	<string name="cant_find_anything_to_display">Can\'t find anything to display</string>
+	<string name="grant_permission">Grant Permission</string>
+	<string name="title_permission_required">Permission Required</string>
 </resources>

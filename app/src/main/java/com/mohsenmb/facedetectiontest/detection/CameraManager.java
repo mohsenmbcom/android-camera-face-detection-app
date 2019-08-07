@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageAnalysisConfig;
@@ -127,6 +128,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 				}
 			});
 		} else {
+			setup();
 			Toast.makeText(
 					activityResolver.resolveActivity(),
 					"You may need to grant the camera permission!",
@@ -139,6 +141,9 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 	}
 
 	private void startCamera() {
+		// To make sure there is no lifecycle bound before
+		CameraX.unbindAll();
+
 		// Bind use cases to lifecycle
 		CameraX.bindToLifecycle(activityResolver.resolveLifecycleOwner(), createPreviewUseCase(), createImageCaptureUseCase(), createAnalyzerUseCase());
 	}
@@ -149,10 +154,13 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 			if (ActivityCompat.checkSelfPermission(activityResolver.resolveActivity(), CAMERA_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
 				permissionGranted();
 			} else {
-				Toast.makeText(
-						activityResolver.resolveActivity(),
-						R.string.error_permission_not_granted,
-						Toast.LENGTH_LONG).show();
+				new AlertDialog.Builder(activityResolver.resolveActivity())
+						.setTitle(R.string.title_permission_required)
+						.setMessage(R.string.error_permission_not_granted)
+						.setNegativeButton(android.R.string.cancel, (dialog, which) -> activityResolver.resolveActivity().finish())
+						.setPositiveButton(R.string.grant_permission, (dialog, which) -> setup())
+						.create()
+						.show();
 			}
 		}
 	}
