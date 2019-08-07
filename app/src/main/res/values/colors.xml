@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<color name="colorPrimary">#686999</color>
-	<color name="colorPrimaryDark">@android:color/transparent</color>
+	<color name="colorPrimaryDark">#4B4C75</color>
 	<color name="colorAccent">#787999</color>
 	<color name="background_camera_bottom_bar">#55000000</color>
 	<color name="stroke_camera_snap">#88ffffff</color>

@@ -1,7 +1,6 @@
 package com.mohsenmb.facedetectiontest.detection;
 
 import android.media.Image;
-import android.util.Log;
 
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
@@ -18,7 +17,7 @@ public class FaceDetectionImageAnalyzer implements ImageAnalysis.Analyzer {
 
 	private FaceDetectionListener faceDetectionListener;
 
-	public FaceDetectionImageAnalyzer() {
+	FaceDetectionImageAnalyzer() {
 		FirebaseVisionFaceDetectorOptions visionRealtimeOptions = new FirebaseVisionFaceDetectorOptions.Builder()
 				.setPerformanceMode(FirebaseVisionFaceDetectorOptions.FAST)
 				.setLandmarkMode(FirebaseVisionFaceDetectorOptions.NO_LANDMARKS)
@@ -57,7 +56,6 @@ public class FaceDetectionImageAnalyzer implements ImageAnalysis.Analyzer {
 
 		detector.detectInImage(image)
 				.addOnSuccessListener(firebaseVisionFaces -> {
-					Log.d("FaceTracking", "Found " + firebaseVisionFaces.size() + " faces!");
 					if (faceDetectionListener != null) {
 						if (!firebaseVisionFaces.isEmpty()) {
 							faceDetectionListener.onFaceDetected(firebaseVisionFaces.size());
@@ -69,7 +67,7 @@ public class FaceDetectionImageAnalyzer implements ImageAnalysis.Analyzer {
 				.addOnFailureListener(Throwable::printStackTrace);
 	}
 
-	public void setFaceDetectionListener(FaceDetectionListener faceDetectionListener) {
+	void setFaceDetectionListener(FaceDetectionListener faceDetectionListener) {
 		this.faceDetectionListener = faceDetectionListener;
 	}
 

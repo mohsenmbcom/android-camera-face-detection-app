@@ -145,7 +145,9 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 		CameraX.unbindAll();
 
 		// Bind use cases to lifecycle
-		CameraX.bindToLifecycle(activityResolver.resolveLifecycleOwner(), createPreviewUseCase(), createImageCaptureUseCase(), createAnalyzerUseCase());
+		if (!activityResolver.resolveActivity().isFinishing() && !activityResolver.resolveActivity().isDestroyed()) {
+			CameraX.bindToLifecycle(activityResolver.resolveLifecycleOwner(), createPreviewUseCase(), createImageCaptureUseCase(), createAnalyzerUseCase());
+		}
 	}
 
 	@Override

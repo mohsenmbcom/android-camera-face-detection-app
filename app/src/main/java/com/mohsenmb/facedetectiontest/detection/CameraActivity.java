@@ -45,7 +45,7 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 
 	@Override
 	protected void onStop() {
-		cameraManager.setup();
+		cameraManager.stop();
 		super.onStop();
 	}
 
