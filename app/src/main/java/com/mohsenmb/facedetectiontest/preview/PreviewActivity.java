@@ -2,6 +2,7 @@ package com.mohsenmb.facedetectiontest.preview;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -12,6 +13,7 @@ import com.mohsenmb.facedetectiontest.R;
 public class PreviewActivity extends AppCompatActivity implements FacePreviewViewModel.OperationStateCallback {
 
 	private FacePreviewViewModel viewModel;
+	private View viewProgress;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,26 +30,27 @@ public class PreviewActivity extends AppCompatActivity implements FacePreviewVie
 			return;
 		}
 
-		viewModel = new FacePreviewViewModel(this, findViewById(R.id.image_cropped_face), this);
-		viewModel.cropFace(imageUri);
+		viewProgress = findViewById(R.id.view_progress);
+
+		viewProgress.post(() -> {
+			viewModel = new FacePreviewViewModel(this, findViewById(R.id.image_cropped_face), this);
+			viewModel.cropFace(imageUri);
+		});
 	}
 
 	@Override
 	public void onOperationStateChanged(FacePreviewViewModel.OperationState state) {
-		String message = "";
 		switch (state) {
 			case InProgress:
-				message = "In Progress";
+				viewProgress.setVisibility(View.VISIBLE);
 				break;
 			case Success:
-				message = "Success!";
+				viewProgress.setVisibility(View.GONE);
 				break;
 			case Failure:
-				message = "Failed cropping the face!";
+				Toast.makeText(this, R.string.error_faild_cropping, Toast.LENGTH_LONG).show();
 				break;
 		}
-
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 	}
 
 	@Override

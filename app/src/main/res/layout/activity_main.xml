@@ -19,7 +19,7 @@
 		<androidx.constraintlayout.widget.ConstraintLayout
 			android:id="@+id/view_snap_panel"
 			android:layout_width="match_parent"
-			android:layout_height="72dp"
+			android:layout_height="88dp"
 			android:layout_gravity="bottom"
 			android:alpha="0"
 			android:background="@color/background_camera_bottom_bar"
@@ -42,5 +42,33 @@
 
 		</androidx.constraintlayout.widget.ConstraintLayout>
 	</FrameLayout>
+
+	<LinearLayout
+		android:id="@+id/frame_camera_overlay"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:background="@color/camera_overlay"
+		android:clickable="true"
+		android:focusable="true"
+		android:gravity="center"
+		android:orientation="vertical">
+
+		<ProgressBar
+			style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:layout_marginStart="16dp"
+			android:layout_marginEnd="16dp"
+			android:indeterminate="true" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:layout_marginTop="8dp"
+			android:text="@string/saving_the_image" />
+
+	</LinearLayout>
 
 </FrameLayout>

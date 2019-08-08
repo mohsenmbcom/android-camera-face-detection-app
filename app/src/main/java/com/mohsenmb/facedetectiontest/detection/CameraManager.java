@@ -122,6 +122,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 
 	void resume() {
 		if (isSetupCompleted) {
+			lastDetectedFaces = 0;
 			if (faceDetectionListener != null) {
 				faceDetectionListener.onNoFaceDetected();
 			}
@@ -140,6 +141,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 			lastDetectedFaces = -1;
 
 			File file = new File(activityResolver.resolveActivity().getCacheDir(), SAVING_IMAGE_NAME);
+
 			imageCapture.takePicture(file, new ImageCapture.OnImageSavedListener() {
 				@Override
 				public void onImageSaved(@NonNull File file) {
@@ -154,6 +156,7 @@ public class CameraManager implements ActivityResolver.PermissionResultListener 
 							Toast.LENGTH_LONG).show();
 				}
 			});
+
 		} else {
 			setup();
 			Toast.makeText(

@@ -45,8 +45,6 @@ public class FacePreviewViewModel {
 			operationStateCallback.onOperationStateChanged(OperationState.InProgress);
 		}
 
-		previewImageView.setImageURI(imageUri);
-
 		if (operationDisposable != null && !operationDisposable.isDisposed()) {
 			operationDisposable.dispose();
 		}
@@ -79,8 +77,6 @@ public class FacePreviewViewModel {
 								(y + height > bitmap.getHeight()) ? bitmap.getHeight() - y : height);
 					}
 				})
-				.subscribeOn(Schedulers.io())
-				.zipWith(Single.just(screenWidth), ((bitmap, width) -> Bitmap.createScaledBitmap(bitmap, width, width * bitmap.getHeight() / bitmap.getWidth(), false)))
 				.subscribeOn(Schedulers.io())
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe(bitmap -> {

@@ -19,23 +19,26 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 	private PermissionResultListener permissionListener;
 	private CameraManager cameraManager;
 	private View viewSnapPanel;
+	private View viewCameraOverlay;
 
 	@Override
 	protected void onStart() {
 		super.onStart();
+
+		viewCameraOverlay = findViewById(R.id.frame_camera_overlay);
+
 		viewSnapPanel = findViewById(R.id.view_snap_panel);
 		cameraManager = new CameraManager(this, findViewById(R.id.texture_view));
 		cameraManager.setFaceDetectionListener(this);
 
-		findViewById(R.id.view_snap_image).setOnClickListener(view -> {
-			view.setEnabled(false);
-			cameraManager.captureImage(image -> {
-				runOnUiThread(() -> {
-					Intent myIntent = new Intent(CameraActivity.this, PreviewActivity.class);
-					myIntent.setData(Uri.fromFile(image));
-					startActivity(myIntent);
-				});
-			});
+		View viewSnap = findViewById(R.id.view_snap_image);
+		viewSnap.setOnClickListener(view -> {
+			viewCameraOverlay.setVisibility(View.VISIBLE);
+			cameraManager.captureImage(image -> runOnUiThread(() -> {
+				Intent myIntent = new Intent(CameraActivity.this, PreviewActivity.class);
+				myIntent.setData(Uri.fromFile(image));
+				startActivity(myIntent);
+			}));
 		});
 		cameraManager.setup();
 	}
@@ -55,6 +58,7 @@ public class CameraActivity extends AppCompatActivity implements ActivityResolve
 	@Override
 	protected void onResume() {
 		super.onResume();
+		viewCameraOverlay.setVisibility(View.GONE);
 		cameraManager.resume();
 	}
 

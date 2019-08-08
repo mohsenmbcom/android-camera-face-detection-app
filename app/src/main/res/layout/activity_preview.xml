@@ -26,6 +26,29 @@
 			tools:ignore="ContentDescription"
 			tools:src="@mipmap/ic_launcher" />
 
+		<LinearLayout
+			android:id="@+id/view_progress"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:orientation="vertical"
+			android:padding="16dp">
+
+			<ProgressBar
+				style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:indeterminate="true" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:layout_marginTop="8dp"
+				android:text="@string/cropping_the_image" />
+		</LinearLayout>
+
 	</androidx.cardview.widget.CardView>
 
 

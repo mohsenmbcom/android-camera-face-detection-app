@@ -1,6 +1,7 @@
 package com.mohsenmb.facedetectiontest.preview;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -13,6 +14,8 @@ import java.util.List;
 import io.reactivex.Single;
 
 public class PreviewFaceDetectionAnalyzer {
+	// This factor is used to make the detecting image smaller, to make the process faster
+	private static final int SCALING_FACTOR = 10;
 
 	private FirebaseVisionFaceDetector detector;
 
@@ -29,12 +32,18 @@ public class PreviewFaceDetectionAnalyzer {
 
 	public Single<BitmapDetectionResult> analyzePhoto(final Bitmap bitmap) {
 		return Single.create(emitter -> {
-
-			FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+			Bitmap smallerBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / SCALING_FACTOR, bitmap.getHeight() / SCALING_FACTOR, false);
+			FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(smallerBitmap);
 
 			detector.detectInImage(image)
 					.addOnFailureListener(emitter::onError)
-					.addOnSuccessListener(faces -> emitter.onSuccess(new BitmapDetectionResult(bitmap, faces)));
+					.addOnSuccessListener(faces -> {
+						for (FirebaseVisionFace face : faces) {
+							Rect rect = face.getBoundingBox();
+							rect.set(rect.left * SCALING_FACTOR, rect.top * SCALING_FACTOR, rect.right * SCALING_FACTOR, rect.bottom * SCALING_FACTOR);
+						}
+						emitter.onSuccess(new BitmapDetectionResult(bitmap, faces));
+					});
 		});
 	}
 
